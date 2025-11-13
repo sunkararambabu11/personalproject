@@ -1,1 +1,41 @@
-<p>menus works!</p>
+<nav class="menu-container" (mouseenter)="onMouseEnter()" (mouseleave)="onMouseLeave()" [class.expanded]="isExpanded">
+	<a 
+		class="menu-item" 
+		[class.active]="activeMenu === 'home'" 
+		(click)="setActiveMenu('home', $event)" 
+		href="#"
+		aria-label="Home"
+		title="Home"
+	>
+		<div class="menu-icon">
+			<i class="fas fa-home"></i>
+		</div>
+		<span class="menu-text">Home</span>
+	</a>
+	<a 
+		class="menu-item" 
+		[class.active]="activeMenu === 'discover'" 
+		(click)="setActiveMenu('discover', $event)" 
+		href="#"
+		aria-label="Discover"
+		title="Discover"
+	>
+		<div class="menu-icon">
+			<i class="fas fa-compass"></i>
+		</div>
+		<span class="menu-text">Discover</span>
+	</a>
+	<a 
+		class="menu-item" 
+		[class.active]="activeMenu === 'services'" 
+		(click)="setActiveMenu('services', $event)" 
+		href="#"
+		aria-label="Services"
+		title="Services"
+	>
+		<div class="menu-icon">
+			<i class="fas fa-briefcase"></i>
+		</div>
+		<span class="menu-text">Services</span>
+	</a>
+</nav>

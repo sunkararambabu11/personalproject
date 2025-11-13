@@ -1,0 +1,330 @@
+<div class="hotel-detail-page">
+	<app-header></app-header>
+
+	<!-- Back Button -->
+	<div class="back-section">
+		<button class="back-btn" (click)="goBack()">
+			<i class="fas fa-arrow-left"></i>
+		</button>
+	</div>
+
+	<!-- Search Bar (Sticky) - Landing Page Style -->
+	<div class="detail-search-bar">
+		<div class="search-bar-inner">
+			<div class="search-field">
+				<label>Where to?</label>
+				<div class="input-wrapper">
+					<i class="fas fa-map-marker-alt"></i>
+					<input type="text" class="search-input" [(ngModel)]="searchParams.location" placeholder="Enter destination" />
+				</div>
+			</div>
+			<div class="search-field">
+				<label>Dates</label>
+				<div class="input-wrapper">
+					<i class="fas fa-calendar"></i>
+					<input type="date" class="search-input date-input" [(ngModel)]="searchParams.checkIn" />
+					<span class="date-separator">-</span>
+					<input type="date" class="search-input date-input" [(ngModel)]="searchParams.checkOut" />
+				</div>
+			</div>
+			<div class="search-field travellers-field" (click)="toggleTravellersPopup()">
+				<label>Travellers</label>
+				<div class="input-wrapper">
+					<i class="fas fa-user"></i>
+					<span class="travellers-text">{{ getTravellersText() }}</span>
+					<i class="fas fa-chevron-down"></i>
+				</div>
+			</div>
+			<button class="search-btn" (click)="searchHotels()">
+				<i class="fas fa-search"></i>
+				Search
+			</button>
+		</div>
+	</div>
+
+	<!-- Travellers Popup -->
+	@if(showTravellersPopup) {
+		<div class="travellers-popup-overlay" (click)="closeTravellersPopup()"></div>
+		<div class="travellers-popup">
+			<div class="popup-header">
+				<h3>Room 1</h3>
+			</div>
+			<div class="popup-content">
+				<div class="traveller-option">
+					<label>Adults</label>
+					<div class="counter">
+						<button type="button" (click)="decreaseAdults(); $event.stopPropagation()" [disabled]="searchParams.adults <= 1">-</button>
+						<span>{{ searchParams.adults }}</span>
+						<button type="button" (click)="increaseAdults(); $event.stopPropagation()">+</button>
+					</div>
+				</div>
+				<div class="traveller-option">
+					<label>Children <span class="age-info">Ages 0 to 17</span></label>
+					<div class="counter">
+						<button type="button" (click)="decreaseChildren(); $event.stopPropagation()" [disabled]="searchParams.children <= 0">-</button>
+						<span>{{ searchParams.children }}</span>
+						<button type="button" (click)="increaseChildren(); $event.stopPropagation()">+</button>
+					</div>
+				</div>
+				<div class="popup-actions">
+					<a href="#" class="link-action" (click)="$event.stopPropagation()">Add another room</a>
+					<a href="#" class="link-action" (click)="$event.stopPropagation()">Need to book 9 or more rooms?</a>
+				</div>
+				<button type="button" class="done-btn" (click)="closeTravellersPopup(); $event.stopPropagation()">Done</button>
+			</div>
+		</div>
+	}
+
+	@if(hotel) {
+		<!-- Hotel Image Gallery -->
+		<div class="hotel-gallery-section">
+			<div class="main-gallery">
+				<div class="main-image">
+					<img [src]="hotel.mainImage || 'assets/images/hotel-placeholder.jpg'" [alt]="hotel.name" />
+				<button class="gallery-btn share-btn">
+					<i class="fas fa-share-alt"></i>
+				</button>
+				<button class="gallery-btn save-btn" (click)="toggleWishlist()">
+					<i class="fas" [class.fa-heart]="hotel.isWishlisted" [class.fa-heart-o]="!hotel.isWishlisted"></i>
+				</button>
+			</div>
+			<div class="thumbnail-grid">
+				@for(image of hotel.galleryImages?.slice(0, 4); track $index) {
+					<div class="thumbnail">
+						<img [src]="image" [alt]="hotel.name" />
+					</div>
+				}
+				@if((hotel.galleryImages?.length || 0) > 4) {
+					<div class="thumbnail more-images">
+						<span>+{{ (hotel.galleryImages?.length || 0) - 4 }}</span>
+						<i class="fas fa-camera"></i>
+					</div>
+				}
+			</div>
+		</div>
+	</div>
+
+		<!-- Hotel Info and Tabs -->
+		<div class="hotel-info-section">
+		<div class="info-main">
+			<div class="hotel-header">
+				<div class="hotel-badge-rating">
+					<span class="luxury-badge">Luxury</span>
+					<div class="stars">
+						@for(star of [1,2,3,4,5]; track star) {
+							<i class="fas fa-star"></i>
+						}
+					</div>
+				</div>
+				<h1 class="hotel-title">{{ hotel.name }}</h1>
+				<div class="hotel-rating-section">
+					<span class="rating-score">{{ hotel.rating }}</span>
+					<span class="rating-label">Excellent</span>
+					<a href="#" class="reviews-link">{{ hotel.reviews }} reviews ></a>
+				</div>
+				<p class="hotel-description">{{ hotel.description }}</p>
+			</div>
+
+			<!-- Navigation Tabs -->
+			<div class="nav-tabs">
+				<button 
+					class="tab" 
+					[class.active]="activeTab === 'overview'"
+					(click)="setActiveTab('overview')"
+				>
+					Overview
+				</button>
+				<button 
+					class="tab" 
+					[class.active]="activeTab === 'about'"
+					(click)="setActiveTab('about')"
+				>
+					About
+				</button>
+				<button 
+					class="tab" 
+					[class.active]="activeTab === 'rooms'"
+					(click)="setActiveTab('rooms')"
+				>
+					Rooms
+				</button>
+				<button 
+					class="tab" 
+					[class.active]="activeTab === 'accessibility'"
+					(click)="setActiveTab('accessibility')"
+				>
+					Accessibility
+				</button>
+				<button 
+					class="tab" 
+					[class.active]="activeTab === 'policies'"
+					(click)="setActiveTab('policies')"
+				>
+					Policies
+				</button>
+				<button class="select-room-btn" (click)="goToRooms()">
+					Select a room
+				</button>
+			</div>
+
+			<!-- Tab Content -->
+			<div class="tab-content">
+				@if(activeTab === 'overview') {
+					<div class="overview-tab">
+						<!-- Highlights -->
+						<div class="highlights-section">
+							<h2>Highlights</h2>
+							<div class="highlights-grid">
+								<div class="highlight-card">
+									<div class="highlight-icon gold">
+										<i class="fas fa-trophy"></i>
+									</div>
+									<h3>Exceptional service & staff</h3>
+									<p>The top-rated staff and service will ensure you feel welcome and pampered.</p>
+								</div>
+								<div class="highlight-card">
+									<div class="highlight-icon blue">
+										<i class="fas fa-gem"></i>
+									</div>
+									<h3>Pool view restaurant</h3>
+									<p>A rare find - enjoy delicious dishes with serene pool views.</p>
+								</div>
+								<div class="highlight-card">
+									<div class="highlight-icon blue">
+										<i class="fas fa-map-marker-alt"></i>
+									</div>
+									<h3>Discover nearby landmarks</h3>
+									<p>Walk to Hussain Sagar Lake and explore the vibrant city.</p>
+								</div>
+							</div>
+						</div>
+
+						<!-- About Property -->
+						<div class="about-section">
+							<h2>About this property</h2>
+							<p class="property-summary">{{ hotel.propertySummary }}</p>
+							<div class="amenities-list">
+								@for(amenity of hotel.amenities; track amenity) {
+									<div class="amenity-item">
+										<i [class]="amenity.icon"></i>
+										<span>{{ amenity.name }}</span>
+									</div>
+								}
+							</div>
+							<a href="#" class="see-all-link">See all about this property ></a>
+						</div>
+
+						<!-- Spa Section -->
+						@if(hotel.spa) {
+							<div class="spa-section">
+								<h2>Spa</h2>
+								<p>{{ hotel.spa.description }}</p>
+								<a href="#" class="see-all-link">See all spa amenities ></a>
+								<div class="spa-image">
+									<img [src]="hotel.spa.image || 'assets/images/spa-placeholder.jpg'" alt="Spa" />
+								</div>
+							</div>
+						}
+					</div>
+				}
+
+				@if(activeTab === 'about') {
+					<div class="about-tab">
+						<h2>About {{ hotel.name }}</h2>
+						<p>{{ hotel.fullDescription }}</p>
+						<div class="amenities-detailed">
+							<h3>Amenities</h3>
+							<div class="amenities-grid">
+								@for(amenity of hotel.allAmenities; track amenity) {
+									<div class="amenity-detail">
+										<i [class]="amenity.icon"></i>
+										<span>{{ amenity.name }}</span>
+									</div>
+								}
+							</div>
+						</div>
+					</div>
+				}
+
+				@if(activeTab === 'rooms') {
+					<div class="rooms-tab">
+						<button class="view-rooms-btn" (click)="goToRooms()">
+							View Available Rooms
+						</button>
+					</div>
+				}
+
+				@if(activeTab === 'accessibility') {
+					<div class="accessibility-tab">
+						<h2>Accessibility</h2>
+						<div class="accessibility-features">
+							@for(feature of hotel.accessibilityFeatures; track feature) {
+								<div class="accessibility-item">
+									<i class="fas fa-check-circle"></i>
+									<span>{{ feature }}</span>
+								</div>
+							}
+						</div>
+					</div>
+				}
+
+				@if(activeTab === 'policies') {
+					<div class="policies-tab">
+						<h2>Policies</h2>
+						<div class="policy-section">
+							<h3>Check-in / Check-out</h3>
+							<p>Check-in: {{ hotel.checkIn }} | Check-out: {{ hotel.checkOut }}</p>
+						</div>
+						<div class="policy-section">
+							<h3>Cancellation Policy</h3>
+							<p>{{ hotel.cancellationPolicy }}</p>
+						</div>
+						<div class="policy-section">
+							<h3>Payment Methods</h3>
+							<p>{{ hotel.paymentMethods }}</p>
+						</div>
+					</div>
+				}
+			</div>
+		</div>
+
+		<!-- Right Sidebar - Map -->
+		<aside class="map-sidebar">
+			<div class="map-section">
+				<h3>Explore the area</h3>
+				<div class="map-container">
+					<div class="map-placeholder">
+						<i class="fas fa-map"></i>
+						<p>Interactive Map</p>
+					</div>
+				</div>
+				<div class="hotel-address">
+					<p>{{ hotel.address }}</p>
+					<a href="#" class="map-link">View in a map ></a>
+				</div>
+			</div>
+
+			<div class="nearby-landmarks">
+				<h3>Nearby Landmarks</h3>
+				<div class="landmarks-list">
+					@for(landmark of hotel.nearbyLandmarks; track landmark.name) {
+						<div class="landmark-item">
+							<i [class]="landmark.icon"></i>
+							<div class="landmark-info">
+								<span class="landmark-name">{{ landmark.name }}</span>
+								<span class="landmark-distance">{{ landmark.distance }}</span>
+							</div>
+						</div>
+					}
+				</div>
+				<a href="#" class="see-all-link">See all about this area ></a>
+			</div>
+		</aside>
+	</div>
+	} @else {
+		<div class="loading-state">
+			<p>Loading hotel details...</p>
+		</div>
+	}
+</div>
+

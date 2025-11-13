@@ -1,0 +1,281 @@
+<div class="room-selection-page">
+	<app-header></app-header>
+
+	<!-- Search Bar (Sticky) - Landing Page Style -->
+	<div class="booking-params">
+		<div class="params-container">
+			<div class="param-field">
+				<label>Where to?</label>
+				<div class="input-wrapper">
+					<i class="fas fa-map-marker-alt"></i>
+					<input type="text" class="search-input" [(ngModel)]="searchParams.location" placeholder="Enter destination" />
+				</div>
+			</div>
+			<div class="param-field">
+				<label>Dates</label>
+				<div class="input-wrapper">
+					<i class="fas fa-calendar"></i>
+					<input type="date" class="search-input date-input" [(ngModel)]="searchParams.checkIn" />
+					<span class="date-separator">-</span>
+					<input type="date" class="search-input date-input" [(ngModel)]="searchParams.checkOut" />
+				</div>
+			</div>
+			<div class="param-field travellers-field" (click)="toggleTravellersPopup()">
+				<label>Travellers</label>
+				<div class="input-wrapper">
+					<i class="fas fa-user"></i>
+					<span class="travellers-text">{{ getTravellersText() }}</span>
+					<i class="fas fa-chevron-down"></i>
+				</div>
+			</div>
+			<button class="search-btn" (click)="searchHotels()">
+				<i class="fas fa-search"></i>
+				Search
+			</button>
+		</div>
+	</div>
+
+	<!-- Travellers Popup -->
+	@if(showTravellersPopup) {
+		<div class="travellers-popup-overlay" (click)="closeTravellersPopup()"></div>
+		<div class="travellers-popup">
+			<div class="popup-header">
+				<h3>Room 1</h3>
+			</div>
+			<div class="popup-content">
+				<div class="traveller-option">
+					<label>Adults</label>
+					<div class="counter">
+						<button type="button" (click)="decreaseAdults(); $event.stopPropagation()" [disabled]="searchParams.adults <= 1">-</button>
+						<span>{{ searchParams.adults }}</span>
+						<button type="button" (click)="increaseAdults(); $event.stopPropagation()">+</button>
+					</div>
+				</div>
+				<div class="traveller-option">
+					<label>Children <span class="age-info">Ages 0 to 17</span></label>
+					<div class="counter">
+						<button type="button" (click)="decreaseChildren(); $event.stopPropagation()" [disabled]="searchParams.children <= 0">-</button>
+						<span>{{ searchParams.children }}</span>
+						<button type="button" (click)="increaseChildren(); $event.stopPropagation()">+</button>
+					</div>
+				</div>
+				<div class="popup-actions">
+					<a href="#" class="link-action" (click)="$event.stopPropagation()">Add another room</a>
+					<a href="#" class="link-action" (click)="$event.stopPropagation()">Need to book 9 or more rooms?</a>
+				</div>
+				<button type="button" class="done-btn" (click)="closeTravellersPopup(); $event.stopPropagation()">Done</button>
+			</div>
+		</div>
+	}
+
+	<!-- Price Indicator -->
+	<div class="price-indicator">
+		<div class="indicator-content">
+			<div class="price-badge">
+				<i class="fas fa-building"></i>
+				<span>Price is typical</span>
+			</div>
+			<p class="price-desc">Consistent with the price of similar properties on our site. <a href="#">More details</a></p>
+			<div class="price-slider">
+				<div class="slider-track">
+					<div class="slider-fill" [style.width.%]="getPricePercentage()"></div>
+					<div class="slider-marker" [style.left.%]="getPricePercentage()">
+						<div class="marker-badge">₹{{ hotel?.typicalPrice | number }} is typical</div>
+					</div>
+				</div>
+				<div class="slider-labels">
+					<span>₹17,000</span>
+					<span>₹22,000</span>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!-- Room Filters -->
+	<div class="room-filters">
+		<div class="filters-container">
+			<button 
+				class="filter-btn" 
+				[class.active]="roomFilter === 'all'"
+				(click)="setRoomFilter('all')"
+			>
+				All rooms
+			</button>
+			<button 
+				class="filter-btn" 
+				[class.active]="roomFilter === '1bed'"
+				(click)="setRoomFilter('1bed')"
+			>
+				1 bed
+			</button>
+			<button 
+				class="filter-btn" 
+				[class.active]="roomFilter === '2beds'"
+				(click)="setRoomFilter('2beds')"
+			>
+				2 beds
+			</button>
+			<div class="room-count">Showing {{ filteredRooms.length }} of {{ rooms.length }} rooms</div>
+		</div>
+	</div>
+
+	<!-- Rooms List -->
+	<div class="rooms-container">
+		<div class="rooms-list">
+			@for(room of filteredRooms; track room.id) {
+				<div class="room-card" [class.featured]="room.isFeatured">
+					@if(room.badge) {
+						<div class="room-badge" [class.lowest]="room.badge === 'Our lowest price'" [class.frequent]="room.badge === 'Frequently booked'" [class.upgrade]="room.badge === 'Upgrade your stay'">
+							{{ room.badge }}
+						</div>
+					}
+
+					<div class="room-image-section">
+						<img [src]="room.image || 'assets/images/room-placeholder.jpg'" [alt]="room.name" />
+						<div class="image-nav">
+							<button class="nav-arrow left"><i class="fas fa-chevron-left"></i></button>
+							<button class="nav-arrow right"><i class="fas fa-chevron-right"></i></button>
+						</div>
+						<div class="image-count">{{ room.imageCount || 6 }} photos</div>
+					</div>
+
+					<div class="room-info-section">
+						<div class="room-header">
+							<h3 class="room-name">{{ room.name }}</h3>
+							<div class="room-rating">
+								<span class="rating-score" [class.exceptional]="room.rating >= 9" [class.good]="room.rating >= 7 && room.rating < 9">
+									{{ room.rating }}
+								</span>
+								<span class="rating-label">
+									@if(room.rating >= 9) {
+										Exceptional
+									} @else if(room.rating >= 7) {
+										Good
+									}
+								</span>
+								<span class="review-count">({{ room.reviews }} reviews)</span>
+							</div>
+						</div>
+
+						<div class="room-features">
+							@for(feature of room.features; track feature) {
+								<div class="feature-item">
+									<i [class]="feature.icon"></i>
+									<span>{{ feature.name }}</span>
+								</div>
+							}
+						</div>
+
+						<div class="room-details">
+							@if(room.bedType) {
+								<p class="bed-info">{{ room.bedType }}</p>
+							}
+							@if(room.view) {
+								<p class="view-info">{{ room.view }}</p>
+							}
+							@if(room.refundable) {
+								<p class="refund-info">
+									<i class="fas fa-check-circle"></i>
+									Fully refundable Before {{ formatRefundDate() }}
+								</p>
+							}
+							@if(room.reserveNow) {
+								<p class="reserve-info">
+									<i class="fas fa-check-circle"></i>
+									Reserve now, pay later
+								</p>
+							}
+						</div>
+
+						@if(room.extras && room.extras.length > 0) {
+							<div class="room-extras">
+								<h4>Extras</h4>
+								@for(extra of room.extras; track extra.id) {
+									<label class="extra-option">
+										<input type="radio" [name]="'extra-' + room.id" [value]="extra.id" [(ngModel)]="selectedExtras[room.id]" />
+										<span>{{ extra.name }}</span>
+										@if(extra.price) {
+											<span class="extra-price">+₹{{ extra.price | number }}</span>
+										}
+									</label>
+								}
+							</div>
+						}
+
+						@if(room.availability) {
+							<div class="availability-info">
+								We have {{ room.availability }} left
+							</div>
+						}
+
+						<div class="room-footer">
+							<div class="room-pricing">
+								<span class="price-amount">₹{{ room.price | number }}</span>
+								<span class="price-total">₹{{ room.totalPrice | number }} total</span>
+								<span class="price-note">includes taxes & fees</span>
+							</div>
+							<button class="reserve-btn" (click)="openPaymentModal(room)">
+								Reserve
+							</button>
+						</div>
+					</div>
+				</div>
+			}
+		</div>
+	</div>
+
+	<!-- Payment Options Modal -->
+	@if(showPaymentModal && selectedRoom) {
+		<div class="modal-backdrop" (click)="closePaymentModal()"></div>
+		<div class="payment-modal">
+			<div class="modal-header">
+				<button class="close-btn" (click)="closePaymentModal()">
+					<i class="fas fa-times"></i>
+				</button>
+				<h2>Your payment options</h2>
+				<div class="refund-info-banner">
+					<i class="fas fa-check-circle"></i>
+					<span>Fully refundable before {{ formatRefundDate() }}</span>
+				</div>
+			</div>
+
+			<div class="payment-options">
+				<div class="payment-option">
+					<h3>Pay when you stay</h3>
+					<ul class="option-features">
+						<li>Pay the property directly in their preferred currency (INR)</li>
+						<li>Please note that we will not issue a tax invoice. You will receive a commercial receipt for the purpose of the transaction. Upon request, a tax invoice would be issued by the property.</li>
+					</ul>
+					<div class="option-price">
+						<span class="price-main">₹{{ selectedRoom.price | number }}</span>
+						<span class="price-total">₹{{ selectedRoom.totalPrice | number }} total</span>
+						<span class="price-note">includes taxes & fees</span>
+					</div>
+					<button class="payment-btn" (click)="proceedToCheckout('pay-later')">
+						Pay at property
+					</button>
+					<p class="payment-note">You will not be charged until your stay</p>
+				</div>
+
+				<div class="payment-option">
+					<h3>Pay now</h3>
+					<ul class="option-features">
+						<li>You can use a valid coupon</li>
+						<li>We will process your payment in your local currency</li>
+						<li>Please note that we will not issue a tax invoice. You will receive a commercial receipt for the purpose of the transaction.</li>
+					</ul>
+					<div class="option-price">
+						<span class="price-main">₹{{ selectedRoom.price | number }}</span>
+						<span class="price-total">₹{{ selectedRoom.totalPrice | number }} total</span>
+						<span class="price-note">includes taxes & fees</span>
+					</div>
+					<button class="payment-btn" (click)="proceedToCheckout('pay-now')">
+						Pay now
+					</button>
+					<p class="payment-note">You will not be charged yet</p>
+				</div>
+			</div>
+		</div>
+	}
+</div>
+

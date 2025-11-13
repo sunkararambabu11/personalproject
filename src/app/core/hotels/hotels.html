@@ -1,0 +1,105 @@
+<div class="hotels-landing">
+	<app-header></app-header>
+
+	<!-- Main Search Section -->
+	<div class="search-hero">
+		<div class="search-container">
+			<h1 class="page-title">Search hotels</h1>
+			
+			<div class="search-bar">
+				<div class="search-field">
+					<label>Where to?</label>
+					<div class="input-wrapper">
+						<i class="fas fa-map-marker-alt"></i>
+						<input type="text" class="search-input" placeholder="Hyderabad (and vicinity), Telangana, India" [(ngModel)]="searchData.location" />
+					</div>
+				</div>
+
+				<div class="search-field">
+					<label>Dates</label>
+					<div class="input-wrapper">
+						<i class="fas fa-calendar"></i>
+						<input type="date" class="search-input" [(ngModel)]="searchData.checkIn" />
+						<span class="date-separator">-</span>
+						<input type="date" class="search-input" [(ngModel)]="searchData.checkOut" />
+					</div>
+				</div>
+
+				<div class="search-field travellers-field" (click)="toggleTravellersPopup()">
+					<label>Travellers</label>
+					<div class="input-wrapper">
+						<i class="fas fa-user"></i>
+						<span class="travellers-text">{{ getTravellersText() }}</span>
+						<i class="fas fa-chevron-down"></i>
+					</div>
+					
+					<!-- Travellers Popup -->
+					@if(showTravellersPopup) {
+						<div class="travellers-popup">
+							<div class="popup-header">
+								<h3>Room 1</h3>
+							</div>
+							<div class="popup-content">
+								<div class="traveller-option">
+									<label>Adults</label>
+									<div class="counter">
+										<button type="button" (click)="decreaseAdults(); $event.stopPropagation()" [disabled]="searchData.adults <= 1">-</button>
+										<span>{{ searchData.adults }}</span>
+										<button type="button" (click)="increaseAdults(); $event.stopPropagation()">+</button>
+									</div>
+								</div>
+								<div class="traveller-option">
+									<label>Children <span class="age-info">Ages 0 to 17</span></label>
+									<div class="counter">
+										<button type="button" (click)="decreaseChildren(); $event.stopPropagation()" [disabled]="searchData.children <= 0">-</button>
+										<span>{{ searchData.children }}</span>
+										<button type="button" (click)="increaseChildren(); $event.stopPropagation()">+</button>
+									</div>
+								</div>
+								<div class="popup-actions">
+									<a href="#" class="link-action" (click)="$event.stopPropagation()">Add another room</a>
+									<a href="#" class="link-action" (click)="$event.stopPropagation()">Need to book 9 or more rooms?</a>
+								</div>
+								<button type="button" class="done-btn" (click)="closeTravellersPopup(); $event.stopPropagation()">Done</button>
+							</div>
+						</div>
+					}
+				</div>
+
+				<button type="button" class="search-button" (click)="searchHotels()">
+					<i class="fas fa-search"></i>
+					Search
+				</button>
+			</div>
+
+			<div class="add-flight">
+				<input type="checkbox" id="add-flight" [(ngModel)]="searchData.addFlight" />
+				<label for="add-flight">Add a flight</label>
+			</div>
+		</div>
+	</div>
+
+	<!-- Trip Ideas Section -->
+	<div class="trip-ideas">
+		<div class="ideas-container">
+			<h2>Ideas for your next trip</h2>
+			<div class="ideas-grid">
+				<div class="idea-card large">
+					<div class="idea-image">
+						<img src="assets/images/trip-idea-1.jpg" alt="Travel destination" />
+					</div>
+					<div class="idea-content">
+						<p class="idea-text">Free cancellation on most hotels</p>
+						<p class="idea-subtext">Because flexibility matters.</p>
+					</div>
+				</div>
+				<div class="idea-card">
+					<div class="idea-content">
+						<p class="idea-text">When you're ready to get away, we'll be ready to inspire you</p>
+						<p class="idea-subtext">Trip ideas and inspiration.</p>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
