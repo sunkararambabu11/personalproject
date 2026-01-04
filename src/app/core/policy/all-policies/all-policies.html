@@ -1,0 +1,282 @@
+<div class="all-policies-container">
+  <div class="page-header">
+    <div class="header-content">
+      <h1><i class="fas fa-list-alt"></i> All Policies</h1>
+      <p>View and manage all insurance policies</p>
+    </div>
+    <div class="header-actions">
+      <!-- Renewal Types Dropdown -->
+      <div class="filter-dropdown">
+        <button class="filter-btn" (click)="toggleRenewalDropdown()" [class.active]="getSelectedRenewalCount() > 0">
+          <i class="fas fa-filter"></i> Renewal Types
+          <span class="filter-count" *ngIf="getSelectedRenewalCount() > 0">{{getSelectedRenewalCount()}}</span>
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="dropdown-menu" *ngIf="isRenewalDropdownOpen">
+          <div class="dropdown-header">
+            <span>Select Renewal Types</span>
+            <button class="clear-filters-btn" (click)="clearRenewalFilters()" *ngIf="getSelectedRenewalCount() > 0">
+              Clear All
+            </button>
+          </div>
+          <div class="dropdown-options">
+            <label class="checkbox-option" *ngFor="let type of renewalTypes">
+              <input 
+                type="checkbox" 
+                [checked]="type.selected" 
+                (change)="toggleRenewalType(type)"
+              />
+              <span class="checkmark"></span>
+              <span class="option-label">{{type.label}}</span>
+            </label>
+          </div>
+          <div class="dropdown-footer">
+            <button class="apply-btn" (click)="applyRenewalFilter()">
+              <i class="fas fa-check"></i> Apply Filter
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <button class="btn-refresh" (click)="refreshPolicies()" [disabled]="isLoading">
+        <i class="fas fa-sync-alt" [class.fa-spin]="isLoading"></i> Refresh
+      </button>
+      <a routerLink="/policy/new" class="btn-create">
+        <i class="fas fa-plus"></i> Create New Policy
+      </a>
+    </div>
+  </div>
+
+  <!-- Search Bar -->
+  <div class="search-section">
+    <div class="search-container">
+      <div class="search-input-wrapper">
+        <i class="fas fa-search search-icon"></i>
+        <input 
+          type="text" 
+          class="search-input" 
+          placeholder="Search by Policy Number or Name..."
+          [(ngModel)]="searchQuery"
+          (keyup)="onSearchKeyup($event)"
+        />
+        <button 
+          class="clear-btn" 
+          *ngIf="searchQuery" 
+          (click)="clearSearch()"
+          title="Clear search">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+
+      <button class="search-btn" (click)="onSearch()" [disabled]="isLoading || isSearching">
+        <i class="fas fa-search" *ngIf="!isSearching"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="isSearching"></i>
+        Search
+      </button>
+    </div>
+    <div class="search-hint" *ngIf="isSearchActive && !isLoading">
+      <span class="search-active-badge" *ngIf="policies.length > 0">
+        <i class="fas fa-check-circle"></i> Found <strong>{{totalPolicies}}</strong> result(s) for "<strong>{{searchQuery}}</strong>"
+        <button class="clear-results-btn" (click)="clearSearch()">
+          <i class="fas fa-times"></i> Clear
+        </button>
+      </span>
+      <span class="search-no-results" *ngIf="policies.length === 0 && !errorMessage">
+        <i class="fas fa-exclamation-circle"></i> No results found for "<strong>{{searchQuery}}</strong>"
+        <button class="clear-results-btn" (click)="clearSearch()">
+          <i class="fas fa-arrow-left"></i> Show All
+        </button>
+      </span>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div class="loading-state" *ngIf="isLoading">
+    <div class="spinner">
+      <i class="fas fa-spinner fa-spin"></i>
+    </div>
+    <p>Loading policies...</p>
+  </div>
+
+  <!-- Error State -->
+  <div class="error-state" *ngIf="errorMessage && !isLoading">
+    <i class="fas fa-exclamation-triangle"></i>
+    <p>{{errorMessage}}</p>
+    <button class="btn-retry" (click)="refreshPolicies()">
+      <i class="fas fa-redo"></i> Try Again
+    </button>
+  </div>
+
+  <!-- Empty State -->
+  <div class="empty-state" *ngIf="!isLoading && !errorMessage && policies.length === 0 && !isSearchActive">
+    <i class="fas fa-folder-open"></i>
+    <h3>No Policies Found</h3>
+    <p>Start by creating your first policy</p>
+    <a routerLink="/policy/new" class="btn-create-first">
+      <i class="fas fa-plus"></i> Create New Policy
+    </a>
+  </div>
+
+  <!-- No Search Results State -->
+  <div class="empty-state search-empty" *ngIf="!isLoading && !errorMessage && policies.length === 0 && isSearchActive">
+    <i class="fas fa-search"></i>
+    <h3>No Results Found</h3>
+    <p>No policies match "<strong>{{searchQuery}}</strong>"</p>
+    <button class="btn-create-first" (click)="clearSearch()">
+      <i class="fas fa-arrow-left"></i> Show All Policies
+    </button>
+  </div>
+
+  <!-- Policies Table -->
+  <div class="table-container" *ngIf="!isLoading && !errorMessage && policies.length > 0">
+    <div class="table-info">
+      <span class="total-count">
+        <i class="fas fa-file-alt"></i> Total Policies: <strong>{{totalPolicies}}</strong>
+      </span>
+      <span class="page-info">
+        Page {{currentPage}} of {{totalPages}}
+      </span>
+    </div>
+    
+    <table class="policies-table">
+      <thead>
+        <tr>
+          <th>
+            <i class="fas fa-hashtag"></i> Policy Number
+          </th>
+          <th>
+            <i class="fas fa-user"></i> Full Name
+          </th>
+          <th>
+            <i class="fas fa-phone"></i> Mobile
+          </th>
+          <th>
+            <i class="fas fa-envelope"></i> Email
+          </th>
+          <th>
+            <i class="fas fa-sync-alt"></i> Mode
+          </th>
+          <th>
+            <i class="fas fa-rupee-sign"></i> Premium
+          </th>
+          <th>
+            <i class="fas fa-info-circle"></i> Status
+          </th>
+          <th class="actions-header">
+            <i class="fas fa-cog"></i> Actions
+          </th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let policy of policies; let i = index" [class.alternate]="i % 2 === 1">
+          <td class="policy-number">
+            <span class="badge clickable" (click)="openPolicyDetail(policy.policyNumber)">
+              {{policy.policyNumber || '-'}}
+            </span>
+          </td>
+          <td class="full-name">
+            {{policy.policyHolder?.fullName || policy.fullName || '-'}}
+          </td>
+          <td class="mobile">
+            <a href="tel:{{policy.policyHolder?.mobile || policy.mobile}}" *ngIf="policy.policyHolder?.mobile || policy.mobile">
+              {{policy.policyHolder?.mobile || policy.mobile}}
+            </a>
+            <span *ngIf="!policy.policyHolder?.mobile && !policy.mobile">-</span>
+          </td>
+          <td class="email">
+            <a href="mailto:{{policy.policyHolder?.email || policy.email}}" *ngIf="policy.policyHolder?.email || policy.email">
+              {{policy.policyHolder?.email || policy.email}}
+            </a>
+            <span *ngIf="!policy.policyHolder?.email && !policy.email">-</span>
+          </td>
+          <td class="premium-mode">
+            <div class="mode-with-tooltip">
+              <span class="mode-badge" [ngClass]="getModeClass(policy.premiumFrequency)">
+                {{policy.premiumFrequency || '-'}}
+              </span>
+              <div class="payment-tooltip" *ngIf="policy.premiumFrequency && policy.premiumFrequency !== 'MONTHLY'">
+                <i class="fas fa-calendar-alt"></i>
+                <span>Payment Months: <strong>{{getPaymentMonths(policy.premiumFrequency, policy.policyStartDate)}}</strong></span>
+              </div>
+            </div>
+          </td>
+          <td class="premium-amount">
+            <span class="amount-value">
+              ₹{{policy.premiumAmount | number:'1.0-0'}}
+            </span>
+          </td>
+          <td class="policy-status">
+            <span class="status-badge" [ngClass]="getStatusClass(policy.policyStatus)">
+              {{policy.policyStatus || '-'}}
+            </span>
+          </td>
+          <td class="actions">
+            <div class="action-buttons">
+              <button class="action-btn view" (click)="openPolicyDetail(policy.policyNumber)" title="View Details">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="action-btn edit" (click)="editPolicy(policy.policyNumber)" title="Edit Policy">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="action-btn delete" (click)="confirmDelete(policy)" title="Delete Policy">
+                <i class="fas fa-trash-alt"></i>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!-- Pagination -->
+    <div class="pagination" *ngIf="totalPages > 1">
+      <button class="page-btn" (click)="prevPage()" [disabled]="currentPage === 1">
+        <i class="fas fa-chevron-left"></i> Previous
+      </button>
+      
+      <div class="page-numbers">
+        <button 
+          *ngFor="let page of getPageNumbers()" 
+          class="page-num" 
+          [class.active]="page === currentPage"
+          (click)="goToPage(page)">
+          {{page}}
+        </button>
+      </div>
+      
+      <button class="page-btn" (click)="nextPage()" [disabled]="currentPage === totalPages">
+        Next <i class="fas fa-chevron-right"></i>
+      </button>
+    </div>
+  </div>
+
+  <!-- Policy Detail Overlay -->
+  <app-policy-detail
+    [policyNumber]="selectedPolicyNumber"
+    [isOpen]="isOverlayOpen"
+    (close)="closeOverlay()"
+    (edit)="onEditPolicy($event)">
+  </app-policy-detail>
+
+  <!-- Delete Confirmation Modal -->
+  <div class="modal-backdrop" *ngIf="showDeleteModal" (click)="cancelDelete()">
+    <div class="delete-modal" (click)="$event.stopPropagation()">
+      <div class="modal-icon">
+        <i class="fas fa-exclamation-triangle"></i>
+      </div>
+      <h3>Delete Policy</h3>
+      <p>Are you sure you want to delete policy <strong>{{policyToDelete?.policyNumber}}</strong>?</p>
+      <p class="warning-text">This action cannot be undone.</p>
+      <div class="modal-actions">
+        <button class="btn-cancel" (click)="cancelDelete()" [disabled]="isDeleting">
+          Cancel
+        </button>
+        <button class="btn-delete" (click)="deletePolicy()" [disabled]="isDeleting">
+          <i class="fas fa-trash-alt" *ngIf="!isDeleting"></i>
+          <i class="fas fa-spinner fa-spin" *ngIf="isDeleting"></i>
+          {{isDeleting ? 'Deleting...' : 'Delete'}}
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+

@@ -40,7 +40,7 @@ ngOnInit(): void {
 
         if(res.user){
           localStorage.setItem('token', res.user.user_id || 'dummy-token'); 
-          this.router.navigate(['/hotels']);
+          this.router.navigate(['/home']);
         }
       },
       failure: (error: any) => {

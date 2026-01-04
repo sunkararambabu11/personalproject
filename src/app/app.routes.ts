@@ -1,22 +1,27 @@
 import { Routes } from '@angular/router';
 import { Login } from './core/auth/components/login/login';
 import { Signup } from './core/auth/components/signup/signup';
-import { Landing } from './core/landing/landing';
-import { Hotels } from './core/hotels/hotels';
-import { HotelResults } from './core/hotels/hotel-results/hotel-results';
-import { HotelDetail } from './core/hotels/hotel-detail/hotel-detail';
-import { RoomSelection } from './core/hotels/room-selection/room-selection';
-import { Checkout } from './core/hotels/checkout/checkout';
+import { Home } from './core/home/home';
+import { NewPolicy } from './core/policy/new-policy/new-policy';
+import { AllPolicies } from './core/policy/all-policies/all-policies';
+import { EditPolicy } from './core/policy/edit-policy/edit-policy';
+import { Layout } from './core/layout/layout';
 import { AuthGuard } from './core/auth/data-access/auth.gaurd';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: Login },
   { path: 'signup', component: Signup },
-  { path: 'hotels', component: Hotels, canActivate: [AuthGuard] },
-  { path: 'hotels/results', component: HotelResults, canActivate: [AuthGuard] },
-  { path: 'hotels/detail/:id', component: HotelDetail, canActivate: [AuthGuard] },
-  { path: 'hotels/rooms/:id', component: RoomSelection, canActivate: [AuthGuard] },
-  { path: 'hotels/checkout', component: Checkout, canActivate: [AuthGuard] }
+  { 
+    path: '', 
+    component: Layout,
+    canActivate: [AuthGuard],
+    children: [
+      { path: 'home', component: Home },
+      { path: 'policy/new', component: NewPolicy },
+      { path: 'policy/list', component: AllPolicies },
+      { path: 'policy/edit/:policyNumber', component: EditPolicy },
+    ]
+  }
 ];
 

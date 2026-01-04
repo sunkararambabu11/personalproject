@@ -1,0 +1,316 @@
+<div class="new-policy-container">
+  <div class="form-header">
+    <h1><i class="fas fa-file-contract"></i> Create New Policy</h1>
+    <p>Fill in the details to create a new LIC policy</p>
+  </div>
+
+  <!-- Progress Steps -->
+  <div class="progress-steps">
+    <div class="step" [class.active]="currentStep >= 1" [class.completed]="currentStep > 1" (click)="goToStep(1)">
+      <div class="step-number">1</div>
+      <span class="step-label">Policy Details</span>
+    </div>
+    <div class="step-line" [class.active]="currentStep > 1"></div>
+    <div class="step" [class.active]="currentStep >= 2" [class.completed]="currentStep > 2" (click)="goToStep(2)">
+      <div class="step-number">2</div>
+      <span class="step-label">Policy Holder</span>
+    </div>
+    <div class="step-line" [class.active]="currentStep > 2"></div>
+    <div class="step" [class.active]="currentStep >= 3" [class.completed]="currentStep > 3" (click)="goToStep(3)">
+      <div class="step-number">3</div>
+      <span class="step-label">Nominee</span>
+    </div>
+    <div class="step-line" [class.active]="currentStep > 3"></div>
+    <div class="step" [class.active]="currentStep >= 4" [class.completed]="currentStep > 4" (click)="goToStep(4)">
+      <div class="step-number">4</div>
+      <span class="step-label">Agent</span>
+    </div>
+  </div>
+
+  <form [formGroup]="policyForm" (ngSubmit)="onSubmit()">
+    
+    <!-- Step 1: Policy Details -->
+    <div class="form-step" *ngIf="currentStep === 1">
+      <h2 class="step-title"><i class="fas fa-clipboard-list"></i> Policy Details</h2>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="policyNumber">Policy Number *</label>
+          <input type="text" id="policyNumber" formControlName="policyNumber" placeholder="Enter policy number" />
+          <div *ngIf="f['policyNumber'].touched && f['policyNumber'].invalid" class="error">Policy Number is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="policyType">Policy Type *</label>
+          <select id="policyType" formControlName="policyType">
+            <option value="">Select Policy Type</option>
+            <option *ngFor="let type of policyTypes" [value]="type">{{type}}</option>
+          </select>
+          <div *ngIf="f['policyType'].touched && f['policyType'].invalid" class="error">Policy Type is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="planCode">Plan Code *</label>
+          <input type="text" id="planCode" formControlName="planCode" placeholder="e.g., 914, 915" />
+          <div *ngIf="f['planCode'].touched && f['planCode'].invalid" class="error">Plan Code is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="policyTerm">Policy Term (Years) *</label>
+          <input type="number" id="policyTerm" formControlName="policyTerm" placeholder="e.g., 15, 20, 25" (change)="calculateEndDate()" />
+          <div *ngIf="f['policyTerm'].touched && f['policyTerm'].invalid" class="error">Policy Term is required (min 1 year)</div>
+        </div>
+
+        <div class="form-group">
+          <label for="premiumTerm">Premium Term (Years) *</label>
+          <input type="number" id="premiumTerm" formControlName="premiumTerm" placeholder="e.g., 10, 15, 20" />
+          <div *ngIf="f['premiumTerm'].touched && f['premiumTerm'].invalid" class="error">Premium Term is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="sumAssured">Sum Assured (₹) *</label>
+          <input type="number" id="sumAssured" formControlName="sumAssured" placeholder="e.g., 500000" />
+          <div *ngIf="f['sumAssured'].touched && f['sumAssured'].invalid" class="error">Sum Assured is required (min ₹10,000)</div>
+        </div>
+
+        <div class="form-group">
+          <label for="premiumAmount">Premium Amount (₹) *</label>
+          <input type="number" id="premiumAmount" formControlName="premiumAmount" placeholder="e.g., 5000" />
+          <div *ngIf="f['premiumAmount'].touched && f['premiumAmount'].invalid" class="error">Premium Amount is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="premiumFrequency">Premium Frequency *</label>
+          <select id="premiumFrequency" formControlName="premiumFrequency">
+            <option value="">Select Frequency</option>
+            <option *ngFor="let freq of premiumFrequencies" [value]="freq">{{freq}}</option>
+          </select>
+          <div *ngIf="f['premiumFrequency'].touched && f['premiumFrequency'].invalid" class="error">Premium Frequency is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="policyStartDate">Policy Start Date *</label>
+          <input type="date" id="policyStartDate" formControlName="policyStartDate" (change)="calculateEndDate()" />
+          <div *ngIf="f['policyStartDate'].touched && f['policyStartDate'].invalid" class="error">Start Date is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="policyEndDate">Policy End Date *</label>
+          <input type="date" id="policyEndDate" formControlName="policyEndDate" />
+          <div *ngIf="f['policyEndDate'].touched && f['policyEndDate'].invalid" class="error">End Date is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="policyStatus">Policy Status *</label>
+          <select id="policyStatus" formControlName="policyStatus">
+            <option *ngFor="let status of policyStatuses" [value]="status">{{status}}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 2: Policy Holder Details -->
+    <div class="form-step" *ngIf="currentStep === 2" formGroupName="policyHolder">
+      <h2 class="step-title"><i class="fas fa-user"></i> Policy Holder Details</h2>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="fullName">Full Name *</label>
+          <input type="text" id="fullName" formControlName="fullName" placeholder="Enter Full Name" />
+          <div *ngIf="policyHolder.get('fullName')?.touched && policyHolder.get('fullName')?.invalid" class="error">Full Name is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="holderDob">Date of Birth *</label>
+          <input type="date" id="holderDob" formControlName="dateOfBirth" />
+          <div *ngIf="policyHolder.get('dateOfBirth')?.touched && policyHolder.get('dateOfBirth')?.invalid" class="error">Date of Birth is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="gender">Gender *</label>
+          <select id="gender" formControlName="gender">
+            <option value="">Select Gender</option>
+            <option *ngFor="let g of genders" [value]="g">{{g}}</option>
+          </select>
+          <div *ngIf="policyHolder.get('gender')?.touched && policyHolder.get('gender')?.invalid" class="error">Gender is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="mobile">Mobile Number *</label>
+          <input type="tel" id="mobile" formControlName="mobile" placeholder="10-digit mobile number" />
+          <div *ngIf="policyHolder.get('mobile')?.touched && policyHolder.get('mobile')?.invalid" class="error">Valid 10-digit mobile number is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input type="email" id="email" formControlName="email" placeholder="email@example.com" />
+          <div *ngIf="policyHolder.get('email')?.touched && policyHolder.get('email')?.invalid" class="error">Valid email is required</div>
+        </div>
+      </div>
+
+      <h3 class="sub-section-title"><i class="fas fa-map-marker-alt"></i> Address Details</h3>
+      <div class="form-grid" formGroupName="address">
+        <div class="form-group full-width">
+          <label for="addressLine1">Address Line 1 *</label>
+          <input type="text" id="addressLine1" formControlName="addressLine1" placeholder="House/Flat No., Street Name" />
+          <div *ngIf="address.get('addressLine1')?.touched && address.get('addressLine1')?.invalid" class="error">Address is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="village">Village</label>
+          <input type="text" id="village" formControlName="village" placeholder="Village Name" />
+        </div>
+
+        <div class="form-group">
+          <label for="mandal">Mandal</label>
+          <input type="text" id="mandal" formControlName="mandal" placeholder="Mandal/Taluk" />
+        </div>
+
+        <div class="form-group">
+          <label for="district">District *</label>
+          <input type="text" id="district" formControlName="district" placeholder="District" />
+          <div *ngIf="address.get('district')?.touched && address.get('district')?.invalid" class="error">District is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="state">State *</label>
+          <input type="text" id="state" formControlName="state" placeholder="State" />
+          <div *ngIf="address.get('state')?.touched && address.get('state')?.invalid" class="error">State is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="pincode">Pincode *</label>
+          <input type="text" id="pincode" formControlName="pincode" placeholder="6-digit pincode" />
+          <div *ngIf="address.get('pincode')?.touched && address.get('pincode')?.invalid" class="error">Valid 6-digit pincode is required</div>
+        </div>
+      </div>
+
+      <h3 class="sub-section-title"><i class="fas fa-id-card"></i> KYC Details <span class="optional-label">(Optional)</span></h3>
+      <div class="form-grid" formGroupName="kyc">
+        <div class="form-group">
+          <label for="aadhaarNumber">Aadhaar Number</label>
+          <input type="text" id="aadhaarNumber" formControlName="aadhaarNumber" placeholder="12-digit Aadhaar number (optional)" />
+          <div *ngIf="kyc.get('aadhaarNumber')?.touched && kyc.get('aadhaarNumber')?.invalid" class="error">Please enter a valid 12-digit Aadhaar number</div>
+        </div>
+
+        <div class="form-group">
+          <label for="panNumber">PAN Number</label>
+          <input type="text" id="panNumber" formControlName="panNumber" placeholder="e.g., ABCDE1234F (optional)" style="text-transform: uppercase;" />
+          <div *ngIf="kyc.get('panNumber')?.touched && kyc.get('panNumber')?.invalid" class="error">Please enter a valid PAN number (e.g., ABCDE1234F)</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Nominee Details -->
+    <div class="form-step" *ngIf="currentStep === 3" formGroupName="nominee">
+      <h2 class="step-title"><i class="fas fa-user-friends"></i> Nominee Details</h2>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="nomineeName">Nominee Name *</label>
+          <input type="text" id="nomineeName" formControlName="name" placeholder="Enter Nominee Name" />
+          <div *ngIf="nominee.get('name')?.touched && nominee.get('name')?.invalid" class="error">Nominee Name is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="relationship">Relationship *</label>
+          <select id="relationship" formControlName="relationship">
+            <option value="">Select Relationship</option>
+            <option *ngFor="let rel of relationships" [value]="rel">{{rel}}</option>
+          </select>
+          <div *ngIf="nominee.get('relationship')?.touched && nominee.get('relationship')?.invalid" class="error">Relationship is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="nomineeDob">Date of Birth *</label>
+          <input type="date" id="nomineeDob" formControlName="dateOfBirth" />
+          <div *ngIf="nominee.get('dateOfBirth')?.touched && nominee.get('dateOfBirth')?.invalid" class="error">Date of Birth is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="percentage">Share Percentage (%) *</label>
+          <input type="number" id="percentage" formControlName="percentage" min="1" max="100" placeholder="100" />
+          <div *ngIf="nominee.get('percentage')?.touched && nominee.get('percentage')?.invalid" class="error">Percentage must be between 1 and 100</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 4: Agent Details -->
+    <div class="form-step" *ngIf="currentStep === 4" formGroupName="agentDetails">
+      <h2 class="step-title"><i class="fas fa-user-tie"></i> Agent Details</h2>
+      
+      <div class="form-grid">
+        <div class="form-group">
+          <label for="agentCode">Agent Code *</label>
+          <input type="text" id="agentCode" formControlName="agentCode" placeholder="Enter Agent Code" />
+          <div *ngIf="agentDetails.get('agentCode')?.touched && agentDetails.get('agentCode')?.invalid" class="error">Agent Code is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="agentName">Agent Name *</label>
+          <input type="text" id="agentName" formControlName="agentName" placeholder="Enter Agent Name" />
+          <div *ngIf="agentDetails.get('agentName')?.touched && agentDetails.get('agentName')?.invalid" class="error">Agent Name is required</div>
+        </div>
+
+        <div class="form-group">
+          <label for="branchCode">Branch Code *</label>
+          <input type="text" id="branchCode" formControlName="branchCode" placeholder="Enter Branch Code" />
+          <div *ngIf="agentDetails.get('branchCode')?.touched && agentDetails.get('branchCode')?.invalid" class="error">Branch Code is required</div>
+        </div>
+      </div>
+
+      <!-- Summary Section -->
+      <div class="summary-section">
+        <h3><i class="fas fa-file-invoice"></i> Policy Summary</h3>
+        <div class="summary-grid">
+          <div class="summary-item">
+            <span class="label">Policy Number:</span>
+            <span class="value">{{policyForm.get('policyNumber')?.value || '-'}}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Policy Type:</span>
+            <span class="value">{{policyForm.get('policyType')?.value || '-'}}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Sum Assured:</span>
+            <span class="value">₹{{(policyForm.get('sumAssured')?.value | number) || '-'}}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Premium:</span>
+            <span class="value">₹{{(policyForm.get('premiumAmount')?.value | number) || '-'}} / {{policyForm.get('premiumFrequency')?.value || '-'}}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Policy Holder:</span>
+            <span class="value">{{policyHolder.get('fullName')?.value || '-'}}</span>
+          </div>
+          <div class="summary-item">
+            <span class="label">Nominee:</span>
+            <span class="value">{{nominee.get('name')?.value || '-'}} ({{nominee.get('relationship')?.value || '-'}})</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Form Navigation -->
+    <div class="form-navigation">
+      <button type="button" class="btn-secondary" (click)="prevStep()" *ngIf="currentStep > 1">
+        <i class="fas fa-arrow-left"></i> Previous
+      </button>
+      <div class="spacer"></div>
+      <button type="button" class="btn-primary" (click)="nextStep()" *ngIf="currentStep < totalSteps">
+        Next <i class="fas fa-arrow-right"></i>
+      </button>
+      <button type="submit" class="btn-submit" *ngIf="currentStep === totalSteps" [disabled]="isSubmitting">
+        <i class="fas fa-check" *ngIf="!isSubmitting"></i>
+        <i class="fas fa-spinner fa-spin" *ngIf="isSubmitting"></i>
+        {{isSubmitting ? 'Submitting...' : 'Create Policy'}}
+      </button>
+    </div>
+
+    <!-- Submit Message -->
+    <div class="submit-message" *ngIf="submitMessage" [class.success]="submitSuccess" [class.error]="!submitSuccess">
+      <i class="fas" [ngClass]="submitSuccess ? 'fa-check-circle' : 'fa-exclamation-circle'"></i>
+      {{submitMessage}}
+    </div>
+  </form>
+</div>

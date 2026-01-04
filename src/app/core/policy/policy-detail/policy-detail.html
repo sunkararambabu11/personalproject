@@ -1,0 +1,209 @@
+<div class="overlay-backdrop" *ngIf="isOpen" (click)="onOverlayClick($event)">
+  <div class="side-overlay" [class.open]="isOpen">
+    <!-- Header -->
+    <div class="overlay-header">
+      <div class="header-title">
+        <i class="fas fa-file-contract"></i>
+        <h2>Policy Details</h2>
+      </div>
+      <div class="header-actions">
+        <button class="btn-edit" (click)="onEdit()" *ngIf="policy && !isLoading" title="Edit Policy">
+          <i class="fas fa-edit"></i>
+        </button>
+        <button class="btn-close" (click)="closeOverlay()" title="Close">
+          <i class="fas fa-times"></i>
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div class="overlay-loading" *ngIf="isLoading">
+      <i class="fas fa-spinner fa-spin"></i>
+      <p>Loading policy details...</p>
+    </div>
+
+    <!-- Error State -->
+    <div class="overlay-error" *ngIf="errorMessage && !isLoading">
+      <i class="fas fa-exclamation-triangle"></i>
+      <p>{{errorMessage}}</p>
+      <button class="btn-retry" (click)="loadPolicyDetails()">
+        <i class="fas fa-redo"></i> Retry
+      </button>
+    </div>
+
+    <!-- Policy Details Content -->
+    <div class="overlay-content" *ngIf="policy && !isLoading && !errorMessage">
+      <!-- Policy Number Banner -->
+      <div class="policy-banner">
+        <span class="policy-number-label">Policy Number</span>
+        <span class="policy-number-value">{{policy.policyNumber}}</span>
+        <span class="policy-status" [ngClass]="policy.policyStatus?.toLowerCase()">
+          {{policy.policyStatus || 'ACTIVE'}}
+        </span>
+      </div>
+
+      <!-- Policy Information -->
+      <div class="detail-section">
+        <h3><i class="fas fa-clipboard-list"></i> Policy Information</h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="label">Policy Type</span>
+            <span class="value">{{policy.policyType || '-'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Plan Code</span>
+            <span class="value">{{policy.planCode || '-'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Policy Term</span>
+            <span class="value">{{policy.policyTerm || '-'}} Years</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Premium Term</span>
+            <span class="value">{{policy.premiumTerm || '-'}} Years</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Sum Assured</span>
+            <span class="value highlight">₹{{policy.sumAssured | number}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Premium Amount</span>
+            <span class="value">₹{{policy.premiumAmount | number}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Premium Frequency</span>
+            <span class="value">{{policy.premiumFrequency || '-'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Start Date</span>
+            <span class="value">{{policy.policyStartDate | date:'dd MMM yyyy'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">End Date</span>
+            <span class="value">{{policy.policyEndDate | date:'dd MMM yyyy'}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Policy Holder Details -->
+      <div class="detail-section">
+        <h3><i class="fas fa-user"></i> Policy Holder</h3>
+        <div class="detail-grid">
+          <div class="detail-item full-width">
+            <span class="label">Full Name</span>
+            <span class="value highlight">{{policy.policyHolder?.fullName || '-'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Date of Birth</span>
+            <span class="value">{{policy.policyHolder?.dateOfBirth | date:'dd MMM yyyy'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Gender</span>
+            <span class="value">{{policy.policyHolder?.gender || '-'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Mobile</span>
+            <span class="value">
+              <a href="tel:{{policy.policyHolder?.mobile}}">{{policy.policyHolder?.mobile || '-'}}</a>
+            </span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Email</span>
+            <span class="value">
+              <a href="mailto:{{policy.policyHolder?.email}}">{{policy.policyHolder?.email || '-'}}</a>
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Address Details -->
+      <div class="detail-section">
+        <h3><i class="fas fa-map-marker-alt"></i> Address</h3>
+        <div class="detail-grid">
+          <div class="detail-item full-width">
+            <span class="label">Address Line</span>
+            <span class="value">{{policy.policyHolder?.address?.addressLine1 || '-'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Village</span>
+            <span class="value">{{policy.policyHolder?.address?.village || '-'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Mandal</span>
+            <span class="value">{{policy.policyHolder?.address?.mandal || '-'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">District</span>
+            <span class="value">{{policy.policyHolder?.address?.district || '-'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">State</span>
+            <span class="value">{{policy.policyHolder?.address?.state || '-'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Pincode</span>
+            <span class="value">{{policy.policyHolder?.address?.pincode || '-'}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- KYC Details -->
+      <div class="detail-section" *ngIf="policy.policyHolder?.kyc?.aadhaarNumber || policy.policyHolder?.kyc?.panNumber">
+        <h3><i class="fas fa-id-card"></i> KYC Details</h3>
+        <div class="detail-grid">
+          <div class="detail-item" *ngIf="policy.policyHolder?.kyc?.aadhaarNumber">
+            <span class="label">Aadhaar Number</span>
+            <span class="value masked">XXXX XXXX {{policy.policyHolder?.kyc?.aadhaarNumber?.slice(-4)}}</span>
+          </div>
+          <div class="detail-item" *ngIf="policy.policyHolder?.kyc?.panNumber">
+            <span class="label">PAN Number</span>
+            <span class="value">{{policy.policyHolder?.kyc?.panNumber || '-'}}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Nominee Details -->
+      <div class="detail-section">
+        <h3><i class="fas fa-user-friends"></i> Nominee</h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="label">Name</span>
+            <span class="value">{{policy.nominee?.name || '-'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Relationship</span>
+            <span class="value">{{policy.nominee?.relationship || '-'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Date of Birth</span>
+            <span class="value">{{policy.nominee?.dateOfBirth | date:'dd MMM yyyy'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Share Percentage</span>
+            <span class="value">{{policy.nominee?.percentage || 100}}%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Agent Details -->
+      <div class="detail-section">
+        <h3><i class="fas fa-user-tie"></i> Agent Details</h3>
+        <div class="detail-grid">
+          <div class="detail-item">
+            <span class="label">Agent Code</span>
+            <span class="value">{{policy.agentDetails?.agentCode || '-'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Agent Name</span>
+            <span class="value">{{policy.agentDetails?.agentName || '-'}}</span>
+          </div>
+          <div class="detail-item">
+            <span class="label">Branch Code</span>
+            <span class="value">{{policy.agentDetails?.branchCode || '-'}}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
