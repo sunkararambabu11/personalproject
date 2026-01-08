@@ -25,6 +25,17 @@ export class NewPolicy implements OnInit {
   genders = ['MALE', 'FEMALE', 'OTHER'];
   relationships = ['SPOUSE', 'SON', 'DAUGHTER', 'FATHER', 'MOTHER', 'BROTHER', 'SISTER', 'OTHER'];
 
+  // Location data
+  allStates: any[] = [];
+  districts: any[] = [];
+  mandals: any[] = [];
+  isLoadingLocations: boolean = false;
+  
+  // Selected location names (for API submission)
+  selectedStateName: string = '';
+  selectedDistrictName: string = '';
+  selectedMandalName: string = '';
+
   constructor(
     private fb: FormBuilder, 
     private router: Router,
@@ -33,6 +44,76 @@ export class NewPolicy implements OnInit {
 
   ngOnInit(): void {
     this.initializeForm();
+    this.loadLocations();
+  }
+
+  loadLocations(): void {
+    this.isLoadingLocations = true;
+    this.policyService.getLocations({
+      success: (response: any) => {
+        console.log('Locations loaded:', response);
+        this.allStates = response || [];
+        this.isLoadingLocations = false;
+      },
+      failure: (error: any) => {
+        console.error('Failed to load locations:', error);
+        this.isLoadingLocations = false;
+      }
+    });
+  }
+
+  onStateChange(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const stateCode = selectElement.value;
+    
+    // Reset district and mandal
+    this.districts = [];
+    this.mandals = [];
+    this.selectedStateName = '';
+    this.selectedDistrictName = '';
+    this.selectedMandalName = '';
+    this.address.patchValue({ district: '', mandal: '' });
+    
+    if (stateCode) {
+      const selectedState = this.allStates.find(s => s.code === stateCode);
+      if (selectedState) {
+        this.selectedStateName = selectedState.name;
+        this.districts = selectedState.districts || [];
+      }
+    }
+  }
+
+  onDistrictChange(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const districtCode = selectElement.value;
+    
+    // Reset mandal
+    this.mandals = [];
+    this.selectedDistrictName = '';
+    this.selectedMandalName = '';
+    this.address.patchValue({ mandal: '' });
+    
+    if (districtCode) {
+      const selectedDistrict = this.districts.find(d => d.code === districtCode);
+      if (selectedDistrict) {
+        this.selectedDistrictName = selectedDistrict.name;
+        this.mandals = selectedDistrict.mandals || [];
+      }
+    }
+  }
+
+  onMandalChange(event: Event): void {
+    const selectElement = event.target as HTMLSelectElement;
+    const mandalCode = selectElement.value;
+    
+    this.selectedMandalName = '';
+    
+    if (mandalCode) {
+      const selectedMandal = this.mandals.find(m => m.code === mandalCode);
+      if (selectedMandal) {
+        this.selectedMandalName = selectedMandal.name;
+      }
+    }
   }
 
   initializeForm(): void {
@@ -198,7 +279,14 @@ export class NewPolicy implements OnInit {
   onSubmit(): void {
     if (this.policyForm.valid) {
       this.isSubmitting = true;
-      const formData = this.policyForm.value;
+      const formData = JSON.parse(JSON.stringify(this.policyForm.value));
+      
+      // Replace location codes with names
+      if (formData.policyHolder && formData.policyHolder.address) {
+        formData.policyHolder.address.state = this.selectedStateName || formData.policyHolder.address.state;
+        formData.policyHolder.address.district = this.selectedDistrictName || formData.policyHolder.address.district;
+        formData.policyHolder.address.mandal = this.selectedMandalName || formData.policyHolder.address.mandal;
+      }
       
       // Add user_id from localStorage
       const userId = localStorage.getItem('token');

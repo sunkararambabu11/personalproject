@@ -162,20 +162,29 @@
         </div>
 
         <div class="form-group">
-          <label for="mandal">Mandal</label>
-          <input type="text" id="mandal" formControlName="mandal" placeholder="Mandal/Taluk" />
+          <label for="state">State *</label>
+          <select id="state" formControlName="state" (change)="onStateChange($event)">
+            <option value="">Select State</option>
+            <option *ngFor="let state of allStates" [value]="state.code">{{state.name}}</option>
+          </select>
+          <div *ngIf="address.get('state')?.touched && address.get('state')?.invalid" class="error">State is required</div>
         </div>
 
         <div class="form-group">
           <label for="district">District *</label>
-          <input type="text" id="district" formControlName="district" placeholder="District" />
+          <select id="district" formControlName="district" (change)="onDistrictChange($event)" [disabled]="districts.length === 0">
+            <option value="">Select District</option>
+            <option *ngFor="let district of districts" [value]="district.code">{{district.name}}</option>
+          </select>
           <div *ngIf="address.get('district')?.touched && address.get('district')?.invalid" class="error">District is required</div>
         </div>
 
         <div class="form-group">
-          <label for="state">State *</label>
-          <input type="text" id="state" formControlName="state" placeholder="State" />
-          <div *ngIf="address.get('state')?.touched && address.get('state')?.invalid" class="error">State is required</div>
+          <label for="mandal">Mandal</label>
+          <select id="mandal" formControlName="mandal" (change)="onMandalChange($event)" [disabled]="mandals.length === 0">
+            <option value="">Select Mandal</option>
+            <option *ngFor="let mandal of mandals" [value]="mandal.code">{{mandal.name}}</option>
+          </select>
         </div>
 
         <div class="form-group">

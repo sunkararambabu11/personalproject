@@ -116,6 +116,13 @@ export class PolicyService {
     this.delete(defaults, options);
   };
 
+  getLocations = (options: any) => {
+    const defaults = {
+      url: API_ENDPOINTS.getLocations
+    };
+    this.get(defaults, options);
+  };
+
   delete = (defaults: any, options: any) => {
     const settings = { ...defaults, ...options };
 
