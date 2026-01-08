@@ -1,5 +1,6 @@
 {
-  "routes": [
-    { "src": "/(.*)", "dest": "/index.html" }
+  "outputDirectory": "dist/myapplication/browser",
+  "rewrites": [
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
