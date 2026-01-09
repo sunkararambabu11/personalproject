@@ -1,19 +1,106 @@
-  <div class="body">
-      <div class="login-box" role="main" aria-label="Login form">
-        <h2>Welcome Back</h2>
-
-        <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
-          <input type="text" id="username" name="username" placeholder="Username" formControlName="email" aria-label="Username" required />
-          <input type="password" id="password" name="password" placeholder="Password" formControlName="password" aria-label="Password" required />
-          <button type="submit">Login</button>
-          @if(loginErrorMsg){
-              <div class="invalidUser f-12 invalidUserPwd">{{loginErrorMsg}}</div>
-          }
-        </form>
-         <div class="signup-link cursor-pointer">
-    Go to <a routerLink="/signup">Sign Up</a>
+<div class="login-container">
+  <!-- Animated background elements -->
+  <div class="bg-animation">
+    <div class="stars"></div>
+    <div class="stars2"></div>
+    <div class="stars3"></div>
+    <div class="aurora"></div>
+    <div class="aurora aurora-2"></div>
   </div>
+
+  <!-- Floating particles -->
+  <div class="particles">
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+    <div class="particle"></div>
+  </div>
+
+  <!-- Login Form -->
+  <div class="login-box" role="main" aria-label="Login form">
+    <div class="logo-section">
+      <div class="logo-circle">
+        <svg class="logo-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <!-- User silhouette -->
+          <circle cx="12" cy="8" r="4" fill="white" opacity="0.9"/>
+          <path d="M4 20C4 16.6863 7.58172 14 12 14C16.4183 14 20 16.6863 20 20" stroke="white" stroke-width="2.5" stroke-linecap="round" fill="none"/>
+          <!-- Lock/Key accent -->
+          <circle cx="18" cy="17" r="4" fill="url(#lockGradient)" stroke="white" stroke-width="1.5"/>
+          <rect x="16.5" y="15.5" width="3" height="2.5" rx="0.5" fill="white" opacity="0.9"/>
+          <path d="M18 18V19.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/>
+          <!-- Gradient definitions -->
+          <defs>
+            <linearGradient id="lockGradient" x1="14" y1="13" x2="22" y2="21" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#22d3ee"/>
+              <stop offset="1" stop-color="#a855f7"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+    </div>
+    
+    <h2 class="title">Welcome Back</h2>
+    <p class="subtitle">Sign in to continue your journey</p>
+
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()" class="login-form">
+      <div class="input-group">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+          <path d="M5 20C5 17.2386 8.13401 15 12 15C15.866 15 19 17.2386 19 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+        <input 
+          type="text" 
+          id="username" 
+          name="username" 
+          placeholder="Enter your username" 
+          formControlName="email" 
+          aria-label="Username" 
+          required 
+        />
+        <span class="input-focus-border"></span>
+      </div>
+      
+      <div class="input-group">
+        <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+          <path d="M8 11V7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7V11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+        </svg>
+        <input 
+          type="password" 
+          id="password" 
+          name="password" 
+          placeholder="Enter your password" 
+          formControlName="password" 
+          aria-label="Password" 
+          required 
+        />
+        <span class="input-focus-border"></span>
+      </div>
+
+      <button type="submit" class="submit-btn">
+        <span class="btn-text">Login</span>
+        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M5 12H19M19 12L12 5M19 12L12 19" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </button>
+
+      @if(loginErrorMsg){
+        <div class="error-message">
+          <svg class="error-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 9V13M12 17H12.01M12 3L2 21H22L12 3Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          {{loginErrorMsg}}
         </div>
+      }
+    </form>
 
+    <div class="signup-link">
+      Don't have an account? <a routerLink="/signup">Sign Up</a>
+    </div>
   </div>
-  
+</div>

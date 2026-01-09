@@ -1,40 +1,158 @@
-
-  <div class="signup-box" role="main" aria-label="Sign up form">
-    <h2>Create Account</h2>
-    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()">
-      <input type="text" formControlName="firstName" placeholder="First Name" />
-   <div *ngIf="f['firstName'].touched && f['firstName'].invalid" class="error">
-  First Name is required.
-</div>
-
-
-      <input type="text" formControlName="lastName" placeholder="Last Name" />
-      <div *ngIf="f['lastName'].touched && f['lastName'].invalid" class="error">Last Name is required.</div>
-
-      <input type="email" formControlName="email" placeholder="Email" />
-     <div *ngIf="f['email'].touched && f['email'].invalid" class="error">
-  Valid email is required.
-</div>
-
-      <input type="tel" formControlName="phoneNumber" placeholder="Phone Number" />
-      <div *ngIf="f['phoneNumber'].touched && f['phoneNumber'].invalid" class="error">
-  Phone number is required (10-15 digits).
-</div>
-      <input type="password" formControlName="password" placeholder="Password" />
-     <div *ngIf="f['password'].touched && f['password'].invalid" class="error">
-  Password must be at least 6 characters.
-</div>
-
-      <input type="password" formControlName="confirmPassword" placeholder="Confirm Password" />
-    <div *ngIf="
-        f['confirmPassword'].touched &&
-        f['confirmPassword'].errors &&
-        f['confirmPassword'].errors['mismatch']
-      " class="error">
-        Passwords do not match.
-    </div>
-
-      <button type="submit" [disabled]="signupForm.invalid">Sign Up</button>
-    </form>
+<div class="signup-container">
+  <!-- Animated ocean background -->
+  <div class="ocean-bg">
+    <div class="wave wave1"></div>
+    <div class="wave wave2"></div>
+    <div class="wave wave3"></div>
+    <div class="wave wave4"></div>
   </div>
 
+  <!-- Floating bubbles -->
+  <div class="bubbles">
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+    <div class="bubble"></div>
+  </div>
+
+  <!-- Floating shapes -->
+  <div class="shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+    <div class="shape shape-3"></div>
+  </div>
+
+  <!-- Signup Form -->
+  <div class="signup-box" role="main" aria-label="Sign up form">
+    <div class="header-section">
+      <div class="icon-wrapper">
+        <svg class="header-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <circle cx="12" cy="8" r="3.5" fill="white" opacity="0.95"/>
+          <path d="M5.5 19.5C5.5 16.1863 8.41015 13.5 12 13.5C15.5899 13.5 18.5 16.1863 18.5 19.5" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <circle cx="18" cy="6" r="4.5" fill="url(#plusGradient)"/>
+          <path d="M18 4V8M16 6H20" stroke="white" stroke-width="2" stroke-linecap="round"/>
+          <defs>
+            <linearGradient id="plusGradient" x1="13.5" y1="1.5" x2="22.5" y2="10.5" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#34d399"/>
+              <stop offset="1" stop-color="#0ea5e9"/>
+            </linearGradient>
+          </defs>
+        </svg>
+      </div>
+      <h2 class="title">Create Account</h2>
+      <p class="subtitle">Start your amazing journey with us</p>
+    </div>
+
+    <form [formGroup]="signupForm" (ngSubmit)="onSubmit()" class="signup-form">
+      <div class="form-row">
+        <div class="input-group">
+          <label class="input-label">First Name</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+              <path d="M5 20C5 17.2386 8.13401 15 12 15C15.866 15 19 17.2386 19 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <input type="text" formControlName="firstName" placeholder="John" />
+          </div>
+          <div *ngIf="f['firstName'].touched && f['firstName'].invalid" class="error">
+            <span class="error-dot"></span> First Name is required
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Last Name</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <circle cx="12" cy="8" r="4" stroke="currentColor" stroke-width="2"/>
+              <path d="M5 20C5 17.2386 8.13401 15 12 15C15.866 15 19 17.2386 19 20" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+            </svg>
+            <input type="text" formControlName="lastName" placeholder="Doe" />
+          </div>
+          <div *ngIf="f['lastName'].touched && f['lastName'].invalid" class="error">
+            <span class="error-dot"></span> Last Name is required
+          </div>
+        </div>
+      </div>
+
+      <div class="input-group full-width">
+        <label class="input-label">Email Address</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="3" y="5" width="18" height="14" rx="2" stroke="currentColor" stroke-width="2"/>
+            <path d="M3 7L12 13L21 7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <input type="email" formControlName="email" placeholder="john.doe@example.com" />
+        </div>
+        <div *ngIf="f['email'].touched && f['email'].invalid" class="error">
+          <span class="error-dot"></span> Valid email is required
+        </div>
+      </div>
+
+      <div class="input-group full-width">
+        <label class="input-label">Phone Number</label>
+        <div class="input-wrapper">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="6" y="2" width="12" height="20" rx="2" stroke="currentColor" stroke-width="2"/>
+            <line x1="10" y1="18" x2="14" y2="18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+          </svg>
+          <input type="tel" formControlName="phoneNumber" placeholder="+1 (555) 000-0000" />
+        </div>
+        <div *ngIf="f['phoneNumber'].touched && f['phoneNumber'].invalid" class="error">
+          <span class="error-dot"></span> Phone number is required (10-15 digits)
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="input-group">
+          <label class="input-label">Password</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M8 11V7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7V11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+            </svg>
+            <input type="password" formControlName="password" placeholder="••••••••" />
+          </div>
+          <div *ngIf="f['password'].touched && f['password'].invalid" class="error">
+            <span class="error-dot"></span> Min 6 characters
+          </div>
+        </div>
+
+        <div class="input-group">
+          <label class="input-label">Confirm Password</label>
+          <div class="input-wrapper">
+            <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <rect x="5" y="11" width="14" height="10" rx="2" stroke="currentColor" stroke-width="2"/>
+              <path d="M8 11V7C8 4.79086 9.79086 3 12 3C14.2091 3 16 4.79086 16 7V11" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+              <circle cx="12" cy="16" r="1.5" fill="currentColor"/>
+            </svg>
+            <input type="password" formControlName="confirmPassword" placeholder="••••••••" />
+          </div>
+          <div *ngIf="f['confirmPassword'].touched && f['confirmPassword'].errors && f['confirmPassword'].errors['mismatch']" class="error">
+            <span class="error-dot"></span> Passwords don't match
+          </div>
+        </div>
+      </div>
+
+      <button type="submit" class="submit-btn" [disabled]="signupForm.invalid">
+        <span class="btn-content">
+          <span class="btn-text">Create Account</span>
+          <svg class="btn-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M12 2L15 8L22 9L17 14L18 21L12 18L6 21L7 14L2 9L9 8L12 2Z" fill="currentColor"/>
+          </svg>
+        </span>
+        <span class="btn-shimmer"></span>
+      </button>
+    </form>
+
+    <div class="login-link">
+      Already have an account? <a routerLink="/login">Sign In</a>
+    </div>
+  </div>
+</div>
